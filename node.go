@@ -1570,7 +1570,7 @@ func (h *brokerEventHandler) HandleLeave(ch string, info *ClientInfo) error {
 	}
 	if h.node.joinOrLeaveHandler != nil {
 		h.node.joinOrLeaveHandler.OnEvent(JoinOrLeaveEvent{
-			EventName: "join",
+			EventName: "leave",
 			Channel:   ch,
 			UserId:    info.UserID,
 			EventTime: time.Now().Format("2006-01-02 15:04:05"),
