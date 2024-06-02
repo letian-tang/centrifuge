@@ -83,6 +83,9 @@ type Node struct {
 	nodeInfoSendHandler NodeInfoSendHandler
 
 	emulationSurveyHandler *emulationSurveyHandler
+
+	joinOrLeaveHandler                JoinOrLeaveHandler
+	disabledJoinOrLeaveEventBroadcast bool
 }
 
 const (
@@ -213,6 +216,11 @@ func (n *Node) subLock(ch string) *sync.Mutex {
 // SetBroker allows setting Broker implementation to use.
 func (n *Node) SetBroker(b Broker) {
 	n.broker = b
+}
+
+func (n *Node) SetJoinOrLeaveHandler(handler JoinOrLeaveHandler, disable bool) {
+	n.joinOrLeaveHandler = handler
+	n.disabledJoinOrLeaveEventBroadcast = disable
 }
 
 // SetPresenceManager allows setting PresenceManager to use.
@@ -1512,6 +1520,10 @@ func (n *Node) OnCommandProcessed(handler CommandProcessedHandler) {
 	n.clientEvents.commandProcessedHandler = handler
 }
 
+type JoinOrLeaveHandler interface {
+	onEvent(eventName string, ch string, userId string)
+}
+
 type brokerEventHandler struct {
 	node *Node
 }
@@ -1529,6 +1541,13 @@ func (h *brokerEventHandler) HandleJoin(ch string, info *ClientInfo) error {
 	if info == nil {
 		panic("nil join ClientInfo received, this must never happen")
 	}
+	if h.node.joinOrLeaveHandler != nil {
+		h.node.joinOrLeaveHandler.onEvent("join", ch, info.UserID)
+	}
+	if h.node.disabledJoinOrLeaveEventBroadcast {
+		return nil
+	}
+
 	return h.node.handleJoin(ch, info)
 }
 
@@ -1536,6 +1555,12 @@ func (h *brokerEventHandler) HandleJoin(ch string, info *ClientInfo) error {
 func (h *brokerEventHandler) HandleLeave(ch string, info *ClientInfo) error {
 	if info == nil {
 		panic("nil leave ClientInfo received, this must never happen")
+	}
+	if h.node.joinOrLeaveHandler != nil {
+		h.node.joinOrLeaveHandler.onEvent("leave", ch, info.UserID)
+	}
+	if h.node.disabledJoinOrLeaveEventBroadcast {
+		return nil
 	}
 	return h.node.handleLeave(ch, info)
 }
