@@ -1525,10 +1525,10 @@ type JoinOrLeaveHandler interface {
 }
 
 type JoinOrLeaveEvent struct {
-	eventName string
-	ch        string
-	userId    string
-	eventTime string
+	EventName string
+	Channel   string
+	UserId    string
+	EventTime string
 }
 
 type brokerEventHandler struct {
@@ -1550,10 +1550,10 @@ func (h *brokerEventHandler) HandleJoin(ch string, info *ClientInfo) error {
 	}
 	if h.node.joinOrLeaveHandler != nil {
 		h.node.joinOrLeaveHandler.OnEvent(JoinOrLeaveEvent{
-			eventName: "join",
-			ch:        ch,
-			userId:    info.UserID,
-			eventTime: time.Now().Format("2006-01-02 15:04:05"),
+			EventName: "join",
+			Channel:   ch,
+			UserId:    info.UserID,
+			EventTime: time.Now().Format("2006-01-02 15:04:05"),
 		})
 	}
 	if h.node.disabledJoinOrLeaveEventBroadcast {
@@ -1570,10 +1570,10 @@ func (h *brokerEventHandler) HandleLeave(ch string, info *ClientInfo) error {
 	}
 	if h.node.joinOrLeaveHandler != nil {
 		h.node.joinOrLeaveHandler.OnEvent(JoinOrLeaveEvent{
-			eventName: "join",
-			ch:        ch,
-			userId:    info.UserID,
-			eventTime: time.Now().Format("2006-01-02 15:04:05"),
+			EventName: "join",
+			Channel:   ch,
+			UserId:    info.UserID,
+			EventTime: time.Now().Format("2006-01-02 15:04:05"),
 		})
 	}
 	if h.node.disabledJoinOrLeaveEventBroadcast {
