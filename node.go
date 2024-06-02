@@ -1525,10 +1525,10 @@ type JoinOrLeaveHandler interface {
 }
 
 type JoinOrLeaveEvent struct {
-	EventName string
-	Channel   string
-	UserId    string
-	EventTime string
+	EventName string `json:"eventName"`
+	Channel   string `json:"channel"`
+	UserId    string `json:"userId"`
+	EventTime string `json:"eventTime"`
 }
 
 type brokerEventHandler struct {
