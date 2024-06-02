@@ -1521,7 +1521,14 @@ func (n *Node) OnCommandProcessed(handler CommandProcessedHandler) {
 }
 
 type JoinOrLeaveHandler interface {
-	OnEvent(eventName string, ch string, userId string)
+	OnEvent(JoinOrLeaveEvent JoinOrLeaveEvent)
+}
+
+type JoinOrLeaveEvent struct {
+	eventName string
+	ch        string
+	userId    string
+	eventTime string
 }
 
 type brokerEventHandler struct {
@@ -1542,7 +1549,12 @@ func (h *brokerEventHandler) HandleJoin(ch string, info *ClientInfo) error {
 		panic("nil join ClientInfo received, this must never happen")
 	}
 	if h.node.joinOrLeaveHandler != nil {
-		h.node.joinOrLeaveHandler.OnEvent("join", ch, info.UserID)
+		h.node.joinOrLeaveHandler.OnEvent(JoinOrLeaveEvent{
+			eventName: "join",
+			ch:        ch,
+			userId:    info.UserID,
+			eventTime: time.Now().Format("2006-01-02 15:04:05"),
+		})
 	}
 	if h.node.disabledJoinOrLeaveEventBroadcast {
 		return nil
@@ -1557,7 +1569,12 @@ func (h *brokerEventHandler) HandleLeave(ch string, info *ClientInfo) error {
 		panic("nil leave ClientInfo received, this must never happen")
 	}
 	if h.node.joinOrLeaveHandler != nil {
-		h.node.joinOrLeaveHandler.OnEvent("leave", ch, info.UserID)
+		h.node.joinOrLeaveHandler.OnEvent(JoinOrLeaveEvent{
+			eventName: "join",
+			ch:        ch,
+			userId:    info.UserID,
+			eventTime: time.Now().Format("2006-01-02 15:04:05"),
+		})
 	}
 	if h.node.disabledJoinOrLeaveEventBroadcast {
 		return nil
